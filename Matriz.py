@@ -2,61 +2,44 @@ import numpy
 import os
 
 package_dir = os.path.dirname(os.path.realpath(__file__))
-with open(package_dir+"/Matriz.txt") as file:
-    matrix = file.readlines()
-    matrix = [line.strip() for line in matrix]
-    file.close()
-    print(matrix)
+with open("Matriz.txt") as file:
+    num_matrix = int(file.readline())
+    print( "Tem ", num_matrix," Matrizes:" )
+    matrixName = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'    
+    matrixes = []
+    matrix_x = []
+    
+    linha = 1
+    for i in range(num_matrix):
+        limM, colM = file.readline().strip().split(';')
+        print( "O número de linhas e colunas da matrix", matrixName[i], "é:", limM, "-", colM + ":")
 
-num_matrix = int(matrix[0])
-print(num_matrix)
+        a = []
+        for i in range(int(limM)):
+            element = file.readline().strip().split(',')
+            a.append(element)
+        matrix = numpy.array(a, dtype=float)
+        print( 'Temos a matrix', matrixName[i], 'com os seguintes valores: \n', '-------------------- \n', matrix, '--------------------' )
+        if matrix.shape[0] == matrix.shape[1]:
+            det = numpy.linalg.det(matrix)
+            print( 'O determinante da matriz', matrixName[i], ' é: ', det)
+            if det == 0:
+                print( 'a', matrixName[i], 'apresenta um det igual a zero, assim não é possível calcular a inversa')
+            else:
+                print( 'a matrix', matrixName[i], 'apresenta sua inversão sendo igual a', numpy.linalg.inv(matrix))
+        else:
+            print( 'Não da para calculcar a det: ', matrixName[i])
+            print( 'Não da para calcular a inversão de: ', matrixName[i])
 
-line=1
-y = [] #lista vazia
-for i in range(num_matrix):
-    limM,colM = matrix[line].split(";")
-    print(limM, " - ", colM)
-    y.append(limM)
-    line +=1
-    for j in range(int(limM)):
-        line +=1
+        matrixes.append(matrix)
+        matrix_x.append(matrixName[i])
+        linha += 1
 
-line = 2
-a = [] #outra lista vazia
-try:
-    for s in range(num_matrix):
-
-        print("-----------------------------")
-        for s in range(num_matrix-1):
-            element = matrix[line].split(",") # element é todos os itens da lista [['1', '2', '3', '4', '5']......['1', '2']]
-            print(element)
-            a.append(element)# aqui ele vai colocar todos os elementos dentro de a (acho q n precisa dessa variável "a" )
-            line +=1
-        line +=1
-except:
-    print("============")
-print(y)# Y = ['3', '3', '3', '2']
-g = int(y[0]) # "g" é o primeiro valor de y, no caso 3
-i=0
-mat1 = [] # lista vazia
-while i < g: #enquanto i for menor que 3
-    mat1.append(a[i]) #a lista vazia vai recever o valor de "a" de acordo com " i " nesse caso sera ['1', '2', '3', '4', '5'], ['6', '7', '8', '9', '10'], ['11', '12', '13', '14', '15']
-    i+=1
-print("zzzzzzzzzzzzzzzzzzzzzzzz")
-print(mat1)# mat1 agora ta com as listas da primeira matriz
-
-#determinante
-
-# lista = []
-# for elemento in matriz:
-#     if ";" in elemento:
-#         elemento.append(lista)
-#         size = lista
-#         print("Nova variável criada: ", size)
-
-
-
-#tamanho_matriz = matriz[1]
-#print(tamanho_matriz)
-
-
+    for i in range(num_matrix - 1):
+        if matrixes[i].shape[1] == matrixes[i+1].shape[0]:
+            result = numpy.dot(matrixes[i], matrixes[i+1])
+            matrix_x.append(matrix_x[i] + matrix_x[i+1])
+            matrixes.append(result)
+            print( 'A multiplicação das matrixes', matrix_x[i], 'e', matrix_x[i+1], 'resultou na matrix', matrix_x[i] + matrix_x[i+1], '\n', '-------------------- \n', result, '--------------------' )
+        else:
+            print( 'Não foi possível multiplicar as matrixes', matrix_x[i], 'e', matrix_x[i+1])
