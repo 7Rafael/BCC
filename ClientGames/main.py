@@ -3,6 +3,7 @@ from button import Button
 from pathlib import Path
 
 pygame.init()
+clock = pygame.time.Clock()
 def get_file_path(name):
     currentPath = os.getcwd()
     absolutePath = os.path.join(currentPath, "assets/", name)
@@ -12,10 +13,10 @@ SCREEN = pygame.display.set_mode((1280, 720))
 pygame.display.set_caption("Menu")
 BG = pygame.image.load(get_file_path("Background.png"))
 confirmSound = pygame.mixer.Sound(get_file_path("8bit_kill_vo_01.ogg"))
-confirmSound.set_volume(1)
+confirmSound.set_volume(.5)
 
 pygame.mixer.music.load(get_file_path("Night_Shade.mp3"))
-pygame.mixer.music.set_volume(1)
+pygame.mixer.music.set_volume(0.5)
 pygame.mixer.music.play(-1)
 class boardSize:
     sizeBoard = 0
@@ -124,7 +125,7 @@ def play():
                 if PLAY_GAME.checkForInput(PLAY_MOUSE_POS):
                     pygame.mixer.music.stop()
                     confirmSound.play()
-                    import tictactoe
+                    tictactoe()
                 if PLAY_GAME2.checkForInput(PLAY_MOUSE_POS):
                     pygame.mixer.music.stop()
                     confirmSound.play()
@@ -136,30 +137,58 @@ def play():
 
         pygame.display.update()
 
-def extra():
+def help():
+    helptext = ""
     while True:
-        EXTRA_MOUSE_POS = pygame.mouse.get_pos()
+
+        HELP_MOUSE_POS = pygame.mouse.get_pos()
 
         SCREEN.fill("black")
 
-        EXTRA_TEXT = get_font(45).render("extra.", True, "white")
-        EXTRA_RECT = EXTRA_TEXT.get_rect(center=(640, 50))
-        SCREEN.blit(EXTRA_TEXT, EXTRA_RECT)
+        game1 = Button(image=None, pos=(300, 60),
+                       text_input="Tictac", font=get_font(20), base_color="White", hovering_color="Green")
 
-        EXTRA_BACK = Button(image=None, pos=(640, 640),
+        game1.changeColor(HELP_MOUSE_POS)
+        game1.update(SCREEN)
+
+        game2 = Button(image=None, pos=(600, 60),
+                       text_input="Frogger", font=get_font(20), base_color="White", hovering_color="Green")
+
+        game2.changeColor(HELP_MOUSE_POS)
+        game2.update(SCREEN)
+
+        game3 = Button(image=None, pos=(900, 60),
+                       text_input="WordZapper", font=get_font(20), base_color="White", hovering_color="Green")
+        game3.changeColor(HELP_MOUSE_POS)
+        game3.update(SCREEN)
+
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if game1.checkForInput(HELP_MOUSE_POS):
+                    helptext = "Como jogar jogo da velha"
+                if game2.checkForInput(HELP_MOUSE_POS):
+                    helptext = "O objetico do frogger é fazer \n galinha atravessar a rua"
+                if game3.checkForInput(HELP_MOUSE_POS):
+                    helptext = "Como jogar wordZapper"
+
+        HELP_TEXT = get_font(25).render(f"{helptext}", True, "green")
+        HELP_RECT = HELP_TEXT.get_rect(center=(640, 320))
+        SCREEN.blit(HELP_TEXT, HELP_RECT)
+
+        HELP_BACK = Button(image=None, pos=(640, 640),
                               text_input="Voltar", font=get_font(45), base_color="white", hovering_color="Green")
 
-        EXTRA_BACK.changeColor(EXTRA_MOUSE_POS)
-        EXTRA_BACK.update(SCREEN)
+        HELP_BACK.changeColor(HELP_MOUSE_POS)
+        HELP_BACK.update(SCREEN)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
-                if EXTRA_BACK.checkForInput(EXTRA_MOUSE_POS):
+                if HELP_BACK.checkForInput(HELP_MOUSE_POS):
                     main_menu()
-
+        clock.tick(60)
         pygame.display.update()
 
 def main_menu():
@@ -174,14 +203,14 @@ def main_menu():
 
         PLAY_BUTTON = Button(image=pygame.image.load(get_file_path("Play Rect.png")), pos=(640, 250),
                              text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="#b68f40")
-        EXTRA_BUTTON = Button(image=pygame.image.load(get_file_path("Options Rect.png")), pos=(640, 400),
-                                text_input="EXTRA", font=get_font(75), base_color="#d7fcd4", hovering_color="#b68f40")
+        HELP_BUTTON = Button(image=pygame.image.load(get_file_path("Options Rect.png")), pos=(640, 400),
+                                text_input="HELP", font=get_font(75), base_color="#d7fcd4", hovering_color="#b68f40")
         QUIT_BUTTON = Button(image=pygame.image.load(get_file_path("Quit Rect.png")), pos=(640, 550),
                              text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="#b68f40")
 
         SCREEN.blit(MENU_TEXT, MENU_RECT)
 
-        for button in [PLAY_BUTTON, EXTRA_BUTTON, QUIT_BUTTON]:
+        for button in [PLAY_BUTTON, HELP_BUTTON, QUIT_BUTTON]:
             button.changeColor(MENU_MOUSE_POS)
             button.update(SCREEN)
 
@@ -192,12 +221,12 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if PLAY_BUTTON.checkForInput(MENU_MOUSE_POS):
                     play()
-                if EXTRA_BUTTON.checkForInput(MENU_MOUSE_POS):
-                    extra()
+                if HELP_BUTTON.checkForInput(MENU_MOUSE_POS):
+                    help()
                 if QUIT_BUTTON.checkForInput(MENU_MOUSE_POS):
                     pygame.quit()
                     sys.exit()
-
+        clock.tick(60)
         pygame.display.update()
 
 
