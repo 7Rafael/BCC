@@ -5,6 +5,26 @@ from sys import exit
 import os
 from pathlib import Path
 import random
+import time
+
+
+countdown_duration = 99
+
+def restartGame():
+    global playing, chosenWord, wordLength, wordLetters, countdown_duration, countingLetter
+    player.return_to_start()
+    playing = False
+    countingLetter = True
+    chosenWord = choose_word()
+    wordLength = 0
+    width = (wordLettersFontWidth + 10) * len(chosenWord)
+    xCurrentLetterRectangle = int(400 - width / 2)
+    wordLetters.clear()
+    for i in range(len(chosenWord)):
+        wordLetters.append(Letter(chosenWord[i], wordLettersFont, xCurrentLetterRectangle, 500,
+                                 wordLettersFontWidth, wordLettersFontHeight))
+        xCurrentLetterRectangle += (wordLettersFontWidth + 10)
+
 
 class Player(pygame.sprite.Sprite):
     def __init__(self, initial_position_x, initial_position_y, speed):
@@ -56,27 +76,24 @@ class Shot(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.center = [x, y]
     def update(self):
-        global options_list, chosenWord, wordLength, wordLetters
+        global options_list, chosenWord, wordLength, wordLetters, play
         self.rect.y -= 10
         for i in range(26):
 
             if self.rect.colliderect(options_list[i].rectangle) and not options_list[i].collided:
                 self.kill()
-                options_list[i].color = (0, 0, 0)
+                options_list[i].color = (48, 32, 152)
 
                 options_list[i].collided = True
-
                 if options_list[i].letter == chosenWord[wordLength].capitalize():
 
                     for letter in range(len(chosenWord)):
-                        if chosenWord[letter].capitalize() == options_list[i].letter:
-                            print(wordLetters[letter].letter)
-                            wordLetters[letter].letter = options_list[i].letter
+                        if chosenWord[letter] == options_list[i].letter:
 
+                            wordLetters[letter].letter = options_list[i].letter
                     wordLength += 1
                     if len(chosenWord) == wordLength:
-                        print("Ganhou")
-
+                        restartGame()
 
         if self.rect.y < 0:
             self.kill()
@@ -129,7 +146,7 @@ class Alphabet():
     def draw_moving_list(self):
         letterSurface = self.fontLetter.render(self.letter, True, self.color)
         window.blit(letterSurface, self.rectangle)
-        self.rectangle.x -= self.speed*0.5
+        self.rectangle.x -= self.speed*0.7
         if self.rectangle.x < 0:
             self.rectangle.x = 1700
             self.color = (255, 255, 255)
@@ -158,23 +175,25 @@ def get_file_path(name):
     absolutePath = os.path.join(currentPath, "assets/", name)
     absolutePath = Path(absolutePath)
     return absolutePath
+
 def write_text(text, font, textColor, positionX, positionY):
     writtenText = font.render(text, True, textColor)
     window.blit(writtenText, (positionX, positionY))
+
 def play_game():
     global playing
     playing = True
-def test():
-    print("test")
+
 def choose_word():
-    #with open("words.txt", encoding="utf-8") as file:  # Read the file in "utf-8" format
-    #    words = file.readlines()  # Read each line of the file and store them in a list
-    #    words = list(map(str.strip, words))  # Remove possible leading and trailing whitespaces from the list
-    #    chosenWord = random.choice(words).upper()  # Standardize the chosen word to have all uppercase letters
-    chosenWord = "asdfg"
+    with open(get_file_path("words.txt"), encoding="utf-8") as file:  # Read the file in "utf-8" format
+        words = file.readlines()  # Read each line of the file and store them in a list
+        words = list(map(str.strip, words))  # Remove possible leading and trailing whitespaces from the list
+        chosenWord = random.choice(words).upper()  # Standardize the chosen word to have all uppercase letters
+        print(chosenWord)
     return chosenWord
 
 if __name__ == "__main__":
+
     pygame.init()
     pygame.font.init()
     window = pygame.display.set_mode((800, 600))
@@ -197,7 +216,6 @@ if __name__ == "__main__":
     scenario = pygame.transform.scale(scenario, (800, 600))
 
     playButton = Button("play", 250, 150, 300, 50, play_game)
-    quitButtonMainMenu = Button("Quit", 250, 350, 300, 50, test)
 
     shotGroup = pygame.sprite.Group()
     alphabetList = list(string.ascii_uppercase)
@@ -228,8 +246,7 @@ if __name__ == "__main__":
         wordLetters.append(Letter(chosenWord[i], wordLettersFont, xCurrentLetterRectangle, 500,
                                  wordLettersFontWidth, wordLettersFontHeight))
         xCurrentLetterRectangle += (wordLettersFontWidth + 10)
-    counting = True
-
+    countingLetter = True
     while play:
         clock.tick(100)
         window.fill((0, 0, 0))
@@ -239,22 +256,24 @@ if __name__ == "__main__":
                 play = False
                 exit()
 
-            if event.type == pygame.KEYDOWN:
-                if pygame.key.get_pressed()[K_p]:
-                    player.return_to_start()
-                    playing = False
-
         if playing:
-            if counting:
-                time = pygame.time.get_ticks()
-                #print(time)
+            time = pygame.time.get_ticks()
+            if countingLetter:
                 if time > 3000:
                     for i in range(len(chosenWord)):
                         wordLetters[i].letter = "_"
-                    counting = False
+                        countingLetter = False
 
+
+            time_elapsed = pygame.time.get_ticks()  # Get the time elapsed in milliseconds
+            countdown = int((countdown_duration - time_elapsed / 1000) + 1)  # Calculate the countdown in seconds
+            if countdown <= 0:
+                restartGame()
+            else:
+                # Display the countdown on the screen
+                countdown_text = f"Time left: {countdown}"
+                write_text("countdown_text", textFont, (255, 255, 255), 100, 100)
             window.fill((48, 32, 152))
-
             for i in range(26):
                 options_list [i].draw_moving_list()
 
@@ -268,12 +287,8 @@ if __name__ == "__main__":
             shotGroup.update()
 
         else:
-            write_text("Word Zapper", titleFont, (255, 255, 255), 300, 50)
-            playButton.draw_button()
-            playButton.click()
+            play_game()
 
-            quitButtonMainMenu.draw_button()
-            quitButtonMainMenu.click()
         pygame.display.update()
 
     pygame.quit()
