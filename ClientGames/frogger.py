@@ -1,9 +1,15 @@
-import pygame, sys
+import pygame, sys, os
 from pygame.locals import *
 from button import Button
+from pathlib import Path
 
 
 pygame.init()
+def get_file_path(name):
+    currentPath = os.getcwd()
+    absolutePath = os.path.join(currentPath, "assets/", name)
+    absolutePath = Path(absolutePath)
+    return absolutePath
 pygame.mixer.init()
 clock = pygame.time.Clock()
 
@@ -18,45 +24,45 @@ red = (255, 0, 0)
 select_color = (60, 130, 210)
 color_hover = (255, 255, 0)
 
-BG = pygame.image.load("assets/Background.png")
+BG = pygame.image.load(get_file_path("Background.png"))
 
-confirmSound = pygame.mixer.Sound('assets/8bit_kill_vo_01.ogg')
+confirmSound = pygame.mixer.Sound(get_file_path('8bit_kill_vo_01.ogg'))
 confirmSound.set_volume(0.01)
 
-pygame.mixer.music.load("assets/Eric Skiff- Underclocked.mp3")
+pygame.mixer.music.load(get_file_path("Eric Skiff- Underclocked.mp3"))
 pygame.mixer.music.set_volume(0)
 pygame.mixer.music.play(-1)
 
-player = pygame.image.load("assets/chicken.png")
+player = pygame.image.load(get_file_path("chicken.png"))
 player = pygame.transform.scale(player, (62, 50))
 colliderPlayer = player.get_rect()
 
-car = pygame.image.load("assets/car.png")
+car = pygame.image.load(get_file_path("car.png"))
 car = pygame.transform.scale(car, (62, 96))
 car = pygame.transform.rotate(car, (-90))
 colliderCar = car.get_rect()
 
-car2 = pygame.image.load("assets/car.png")
+car2 = pygame.image.load(get_file_path("car.png"))
 car2 = pygame.transform.scale(car2, (62, 96))
 car2 = pygame.transform.rotate(car2, (-90))
 colliderCar2 = car2.get_rect()
 
-car3 = pygame.image.load("assets/car.png")
+car3 = pygame.image.load(get_file_path("car.png"))
 car3 = pygame.transform.scale(car3, (62, 96))
 car3 = pygame.transform.rotate(car3, (-90))
 colliderCar3 = car3.get_rect()
 
-carR = pygame.image.load("assets/car.png")
+carR = pygame.image.load(get_file_path("car.png"))
 carR = pygame.transform.scale(carR, (62, 96))
 carR = pygame.transform.rotate(carR, (90))
 colliderCarR = carR.get_rect()
 
-carR2 = pygame.image.load("assets/car.png")
+carR2 = pygame.image.load(get_file_path("car.png"))
 carR2 = pygame.transform.scale(carR2, (62, 96))
 carR2 = pygame.transform.rotate(carR2, (90))
 colliderCarR2 = carR2.get_rect()
 
-carR3 = pygame.image.load("assets/car.png")
+carR3 = pygame.image.load(get_file_path("car.png"))
 carR3 = pygame.transform.scale(carR3, (62, 96))
 carR3 = pygame.transform.rotate(carR3, (90))
 colliderCarR3 = carR3.get_rect()
@@ -64,7 +70,7 @@ colliderCarR3 = carR3.get_rect()
 screen = pygame.display.set_mode((width, height))
 pygame.display.set_caption("Frogger")
 
-bg = pygame.image.load("assets/BackgroundFrogger.png")
+bg = pygame.image.load(get_file_path("BackgroundFrogger.png"))
 bg = pygame.transform.scale(bg, (width, height))
 
 def check_win():
@@ -73,7 +79,7 @@ def check_win():
         win += 1
         start_game()
 def get_font(size):  # Returns Press-Start-2P in the desired size
-    return pygame.font.Font("assets/font.ttf", size)
+    return pygame.font.Font(get_file_path("font.ttf"), size)
 def start_game():
     global colliderPlayer,colliderCar, colliderCar2, playerSpeed, win
     Run = True
@@ -168,9 +174,9 @@ def main():
         MENU_TEXT = get_font(100).render("Frogger", True, "#b68f40")
         MENU_RECT = MENU_TEXT.get_rect(center=(640, 100))
 
-        PLAY_BUTTON = Button(image=pygame.image.load("assets/Play Rect.png"), pos=(640, 250),
+        PLAY_BUTTON = Button(image=pygame.image.load(get_file_path("Play Rect.png")), pos=(640, 250),
                              text_input="PLAY", font=get_font(75), base_color="#d7fcd4", hovering_color="#b68f40")
-        QUIT_BUTTON = Button(image=pygame.image.load("assets/Quit Rect.png"), pos=(640, 400),
+        QUIT_BUTTON = Button(image=pygame.image.load(get_file_path("Quit Rect.png")), pos=(640, 400),
                              text_input="QUIT", font=get_font(75), base_color="#d7fcd4", hovering_color="#b68f40")
 
         screen.blit(MENU_TEXT, MENU_RECT)
